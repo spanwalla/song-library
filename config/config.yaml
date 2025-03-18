@@ -1,0 +1,15 @@
+app:
+  name: 'song-library'
+  version: '1.0.0'
+
+http:
+  port: '8080'
+
+logger:
+  level: 'debug'
+
+postgres:
+  pool_max: 15
+
+song_api:
+  url: '127.0.0.1:8079'
