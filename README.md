@@ -13,7 +13,7 @@ git clone https://github.com/spanwalla/song-library
 cd song-library
 ```
 2. Создайте файл `.env` в корневом каталоге проекта (можно скопировать [`.env.example`](.env.example)).
-3. Задайте URL внешнего сервиса, который будет возвращать информацию о песнях в файле [`config/config.yaml`](config/config.yaml) (`song-api > url`).
+3. Задайте URL внешнего сервиса, который будет возвращать информацию о песнях (параметр окружения `SONG_API_URL`).
 4. Выполните команду
 ```
 docker-compose up --build -d
