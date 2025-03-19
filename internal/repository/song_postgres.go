@@ -129,14 +129,33 @@ func (r *SongRepo) Search(ctx context.Context, filters map[string]string, orderB
 	return songs, nil
 }
 
-func (r *SongRepo) UpdateById(ctx context.Context, songId int, song entity.Song) error {
+func buildUpdateMap(input UpdateSongInput) map[string]any {
+	updates := make(map[string]any)
+	if input.Name != nil {
+		updates["song_name"] = *input.Name
+	}
+	if input.Group != nil {
+		updates["group_name"] = *input.Group
+	}
+	if input.Link != nil {
+		updates["link"] = *input.Link
+	}
+	if input.ReleaseDate != nil {
+		updates["release_date"] = *input.ReleaseDate
+	}
+	return updates
+}
+
+func (r *SongRepo) UpdateById(ctx context.Context, songId int, input UpdateSongInput) error {
+	updates := buildUpdateMap(input)
+	if len(updates) == 0 {
+		return nil
+	}
+
 	sql, args, _ := r.Builder.
 		Update("songs").
 		Where("id = ?", songId).
-		Set("song_name", song.Name).
-		Set("group_name", song.Group).
-		Set("link", song.Link).
-		Set("release_date", song.ReleaseDate).
+		SetMap(updates).
 		ToSql()
 
 	_, err := r.GetQueryRunner(ctx).Exec(ctx, sql, args...)

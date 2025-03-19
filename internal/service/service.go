@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"time"
-
 	"github.com/spanwalla/song-library/internal/entity"
 	"github.com/spanwalla/song-library/internal/repository"
 	"github.com/spanwalla/song-library/internal/webapi"
@@ -17,10 +15,10 @@ type InsertSongInput struct {
 }
 
 type UpdateSongInput struct {
-	Name        string
-	Group       string
-	Link        string
-	ReleaseDate time.Time
+	Name        *string
+	Group       *string
+	Link        *string
+	ReleaseDate *string
 }
 
 type GetTextInput struct {

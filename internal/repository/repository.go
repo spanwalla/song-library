@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/spanwalla/song-library/internal/entity"
 	"github.com/spanwalla/song-library/pkg/postgres"
@@ -19,13 +20,18 @@ type Transactor interface {
 	WithinTransaction(ctx context.Context, fn func(ctx context.Context) error) error
 }
 
-// TODO: Добавить поиск по полям
+type UpdateSongInput struct {
+	Name        *string
+	Group       *string
+	Link        *string
+	ReleaseDate *time.Time
+}
 
 type Song interface {
 	Insert(ctx context.Context, song entity.Song) (int, error)
 	GetById(ctx context.Context, songId int) (entity.Song, error)
 	Search(ctx context.Context, filters map[string]string, orderBy [][]string, offset, limit int) ([]entity.Song, error)
-	UpdateById(ctx context.Context, songId int, song entity.Song) error
+	UpdateById(ctx context.Context, songId int, input UpdateSongInput) error
 	DeleteById(ctx context.Context, songId int) error
 }
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -114,11 +115,26 @@ func (s *SongService) GetText(ctx context.Context, input GetTextInput) ([]string
 }
 
 func (s *SongService) Update(ctx context.Context, songId int, input UpdateSongInput) error {
-	err := s.songRepo.UpdateById(ctx, songId, entity.Song{
+	if input.Name == nil && input.Group == nil && input.Link == nil && input.ReleaseDate == nil {
+		return ErrFieldsAreEmpty
+	}
+
+	var releaseDate *time.Time = nil
+
+	if input.ReleaseDate != nil {
+		var err error
+		*releaseDate, err = time.Parse("2006-01-02", *input.ReleaseDate)
+		if err != nil {
+			log.Errorf("SongService.Update - time.Parse: %v", err)
+			return ErrCannotUpdateSong
+		}
+	}
+
+	err := s.songRepo.UpdateById(ctx, songId, repository.UpdateSongInput{
 		Name:        input.Name,
 		Group:       input.Group,
 		Link:        input.Link,
-		ReleaseDate: input.ReleaseDate,
+		ReleaseDate: releaseDate,
 	})
 	if err != nil {
 		log.Errorf("SongService.Update - s.songRepo.UpdateById: %v", err)

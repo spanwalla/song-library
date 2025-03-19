@@ -2,10 +2,8 @@ package v1
 
 import (
 	"errors"
-	"net/http"
-	"time"
-
 	"github.com/labstack/echo/v4"
+	"net/http"
 
 	_ "github.com/spanwalla/song-library/internal/entity" // for swagger docs
 	"github.com/spanwalla/song-library/internal/service"
@@ -26,11 +24,11 @@ type insertSongInput struct {
 }
 
 type updateSongInput struct {
-	Id          int    `param:"id" validate:"number,gt=0"`
-	Group       string `json:"group" validate:"required,max=128" example:"Hannah"`
-	Song        string `json:"song" validate:"required,max=128" example:"Best Compilation"`
-	Link        string `json:"link" validate:"required,max=128,uri" example:"https://www.youtube.com/watch?v=Xsp3_a-PMTw"`
-	ReleaseDate string `json:"releaseDate" validate:"required,date" example:"2006-06-22"`
+	Id          int     `param:"id" validate:"number,gt=0"`
+	Group       *string `json:"group" validate:"omitempty,max=128" example:"Hannah"`
+	Song        *string `json:"song" validate:"omitempty,max=128" example:"Best Compilation"`
+	Link        *string `json:"link" validate:"omitempty,max=128,uri" example:"https://www.youtube.com/watch?v=Xsp3_a-PMTw"`
+	ReleaseDate *string `json:"releaseDate" validate:"omitempty,date" example:"2006-06-22"`
 }
 
 type updateSongTextInput struct {
@@ -45,7 +43,7 @@ func newSongRoutes(g *echo.Group, songService service.Song) {
 	g.GET("/:id", r.getSong)
 	g.GET("/:id/text", r.getSongText)
 	g.DELETE("/:id", r.deleteSong)
-	g.PUT("/:id", r.putSong)
+	g.PATCH("/:id", r.patchSong)
 	g.PUT("/:id/text", r.putSongText)
 	g.POST("", r.insertSong)
 }
@@ -207,11 +205,11 @@ func (r *songRoutes) deleteSong(c echo.Context) error {
 // @Param id path int true "Song ID" minimum(1) example(2)
 // @Param song body updateSongInput true "JSON-body"
 // @Accept json
-// @Success 200
+// @Success 204
 // @Failure 400 {object} echo.HTTPError
 // @Failure 500 {object} echo.HTTPError
-// @Router /songs/{id} [put]
-func (r *songRoutes) putSong(c echo.Context) error {
+// @Router /songs/{id} [patch]
+func (r *songRoutes) patchSong(c echo.Context) error {
 	var input updateSongInput
 
 	if err := c.Bind(&input); err != nil {
@@ -224,24 +222,18 @@ func (r *songRoutes) putSong(c echo.Context) error {
 		return err
 	}
 
-	releaseDate, err := time.Parse("2006-01-02", input.ReleaseDate)
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid date format")
-		return err
-	}
-
-	err = r.songService.Update(c.Request().Context(), input.Id, service.UpdateSongInput{
+	err := r.songService.Update(c.Request().Context(), input.Id, service.UpdateSongInput{
 		Name:        input.Song,
 		Group:       input.Group,
 		Link:        input.Link,
-		ReleaseDate: releaseDate,
+		ReleaseDate: input.ReleaseDate,
 	})
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "internal server error")
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // @Description Edit song text by id
@@ -249,7 +241,7 @@ func (r *songRoutes) putSong(c echo.Context) error {
 // @Param id path int true "Song ID" example(2)
 // @Param text body updateSongTextInput true "New song text. Each couplet is separated by double newline symbols."
 // @Accept json
-// @Success 200
+// @Success 204
 // @Failure 400 {object} echo.HTTPError
 // @Failure 500 {object} echo.HTTPError
 // @Router /songs/{id}/text [put]
@@ -272,7 +264,7 @@ func (r *songRoutes) putSongText(c echo.Context) error {
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // @Description Add new song
