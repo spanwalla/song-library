@@ -21,21 +21,21 @@ type songIdInput struct {
 }
 
 type insertSongInput struct {
-	Group string `json:"group" validate:"required,max=128"`
-	Song  string `json:"song" validate:"required,max=128"`
+	Group string `json:"group" validate:"required,max=128" example:"The Cure"`
+	Song  string `json:"song" validate:"required,max=128" example:"Love Song"`
 }
 
 type updateSongInput struct {
 	Id          int    `param:"id" validate:"number,gt=0"`
-	Group       string `json:"group" validate:"required,max=128"`
-	Song        string `json:"song" validate:"required,max=128"`
-	Link        string `json:"link" validate:"required,max=128,uri"`
-	ReleaseDate string `json:"releaseDate" validate:"required,date"`
+	Group       string `json:"group" validate:"required,max=128" example:"Hannah"`
+	Song        string `json:"song" validate:"required,max=128" example:"Best Compilation"`
+	Link        string `json:"link" validate:"required,max=128,uri" example:"https://www.youtube.com/watch?v=Xsp3_a-PMTw"`
+	ReleaseDate string `json:"releaseDate" validate:"required,date" example:"2006-06-22"`
 }
 
 type updateSongTextInput struct {
 	Id   int    `param:"id" validate:"number,gt=0"`
-	Text string `json:"text" validate:"required"`
+	Text string `json:"text" validate:"required" example:"I can do\nit easily\n\nNew couplet.\n\nAnother one."`
 }
 
 func newSongRoutes(g *echo.Group, songService service.Song) {
@@ -52,10 +52,10 @@ func newSongRoutes(g *echo.Group, songService service.Song) {
 
 // @Description Search songs with filters
 // @Summary Search songs
-// @Param filter[<name>] query string false "Example: ?filter[name]=Song&filter[group]=Muse"
-// @Param order_by query string false "Example: ?order_by=name:asc,link:desc,group. Default: asc"
-// @Param offset query int false "Offset, default 0"
-// @Param limit query int false "Limit, default 5"
+// @Param filter[<name>] query string false "Filters, can be multiple" example(Muse)
+// @Param order_by query string false "List of sort criteria. Direction will set to asc if it is not stated" example(song:asc,group:desc,release_date)
+// @Param offset query int false "Offset" default(0) minimum(0) example(10)
+// @Param limit query int false "Limit" default(5) minimum(1) maximum(10) example(10)
 // @Produce json
 // @Success 200 {array} entity.Song
 // @Failure 400 {object} echo.HTTPError
@@ -88,7 +88,7 @@ func (r *songRoutes) searchSongs(c echo.Context) error {
 
 // @Description Get song by id
 // @Summary Get song by id
-// @Param id path int true "Song ID"
+// @Param id path int true "Song ID" minimum(1) example(2)
 // @Produce json
 // @Success 200 {object} entity.Song
 // @Failure 400 {object} echo.HTTPError
@@ -123,9 +123,9 @@ func (r *songRoutes) getSong(c echo.Context) error {
 
 // @Description Get song text with pagination by couplets
 // @Summary Get song text
-// @Param id path int true "Song ID"
-// @Param offset query int false "Offset, default 0"
-// @Param limit query int false "Limit, default 5"
+// @Param id path int true "Song ID" minimum(1) example(2)
+// @Param offset query int false "Offset" default(0) minimum(0) example(10)
+// @Param limit query int false "Limit" default(5) minimum(1) maximum(10) example(10)
 // @Produce json
 // @Success 200 {object} v1.songRoutes.getSongText.response
 // @Failure 400 {object} echo.HTTPError
@@ -175,7 +175,7 @@ func (r *songRoutes) getSongText(c echo.Context) error {
 
 // @Description Delete song by id
 // @Summary Delete song
-// @Param id path int true "Song ID"
+// @Param id path int true "Song ID" minimum(1) example(2)
 // @Success 200
 // @Failure 400 {object} echo.HTTPError
 // @Failure 500 {object} echo.HTTPError
@@ -204,9 +204,8 @@ func (r *songRoutes) deleteSong(c echo.Context) error {
 
 // @Description Edit song by id
 // @Summary Edit song
-// @Param id path int true "Song ID"
-// @Param song body string false "Song name"
-// @Param group body string false "Group name"
+// @Param id path int true "Song ID" minimum(1) example(2)
+// @Param song body updateSongInput true "JSON-body"
 // @Accept json
 // @Success 200
 // @Failure 400 {object} echo.HTTPError
@@ -247,8 +246,8 @@ func (r *songRoutes) putSong(c echo.Context) error {
 
 // @Description Edit song text by id
 // @Summary Edit song text
-// @Param id path int true "Song ID"
-// @Param text body string true "New song text. Each couplet is separated by `\n\n`"
+// @Param id path int true "Song ID" example(2)
+// @Param text body updateSongTextInput true "New song text. Each couplet is separated by double newline symbols."
 // @Accept json
 // @Success 200
 // @Failure 400 {object} echo.HTTPError
@@ -278,8 +277,7 @@ func (r *songRoutes) putSongText(c echo.Context) error {
 
 // @Description Add new song
 // @Summary Add new song
-// @Param song body string true "Song name"
-// @Param group body string true "Group name"
+// @Param group body insertSongInput true "Short song info"
 // @Accept json
 // @Success 201
 // @Failure 400 {object} echo.HTTPError

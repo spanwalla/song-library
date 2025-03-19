@@ -7,17 +7,77 @@ definitions:
   github_com_spanwalla_song-library_internal_entity.Song:
     properties:
       group:
+        example: Nirvana
+        type: string
+      id:
+        example: 1
+        type: integer
+      link:
+        example: https://www.youtube.com/watch?v=JirXTmnItd4
+        type: string
+      releaseDate:
+        example: "2002-10-29T00:00:00Z"
+        type: string
+      song:
+        example: Smells Like Teen Spirit
+        type: string
+    type: object
+  internal_controller_http_v1.insertSongInput:
+    properties:
+      group:
+        example: The Cure
+        maxLength: 128
+        type: string
+      song:
+        example: Love Song
+        maxLength: 128
+        type: string
+    required:
+    - group
+    - song
+    type: object
+  internal_controller_http_v1.songRoutes:
+    type: object
+  internal_controller_http_v1.updateSongInput:
+    properties:
+      group:
+        example: Hannah
+        maxLength: 128
         type: string
       id:
         type: integer
       link:
+        example: https://www.youtube.com/watch?v=Xsp3_a-PMTw
+        maxLength: 128
         type: string
       releaseDate:
+        example: "2006-06-22"
         type: string
       song:
+        example: Best Compilation
+        maxLength: 128
         type: string
+    required:
+    - group
+    - link
+    - releaseDate
+    - song
     type: object
-  internal_controller_http_v1.songRoutes:
+  internal_controller_http_v1.updateSongTextInput:
+    properties:
+      id:
+        type: integer
+      text:
+        example: |-
+          I can do
+          it easily
+
+          New couplet.
+
+          Another one.
+        type: string
+    required:
+    - text
     type: object
 host: localhost:8080
 info:
@@ -29,20 +89,30 @@ paths:
     get:
       description: Search songs with filters
       parameters:
-      - description: 'Example: ?filter[name]=Song&filter[group]=Muse'
+      - description: Filters, can be multiple
+        example: Muse
         in: query
         name: filter[<name>]
         type: string
-      - description: 'Example: ?order_by=name:asc,link:desc,group. Default: asc'
+      - description: List of sort criteria. Direction will set to asc if it is not
+          stated
+        example: song:asc,group:desc,release_date
         in: query
         name: order_by
         type: string
-      - description: Offset, default 0
+      - default: 0
+        description: Offset
+        example: 10
         in: query
+        minimum: 0
         name: offset
         type: integer
-      - description: Limit, default 5
+      - default: 5
+        description: Limit
+        example: 10
         in: query
+        maximum: 10
+        minimum: 1
         name: limit
         type: integer
       produces:
@@ -68,18 +138,12 @@ paths:
       - application/json
       description: Add new song
       parameters:
-      - description: Song name
-        in: body
-        name: song
-        required: true
-        schema:
-          type: string
-      - description: Group name
+      - description: Short song info
         in: body
         name: group
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/internal_controller_http_v1.insertSongInput'
       responses:
         "201":
           description: Created
@@ -97,7 +161,9 @@ paths:
       description: Delete song by id
       parameters:
       - description: Song ID
+        example: 2
         in: path
+        minimum: 1
         name: id
         required: true
         type: integer
@@ -117,7 +183,9 @@ paths:
       description: Get song by id
       parameters:
       - description: Song ID
+        example: 2
         in: path
+        minimum: 1
         name: id
         required: true
         type: integer
@@ -147,20 +215,18 @@ paths:
       description: Edit song by id
       parameters:
       - description: Song ID
+        example: 2
         in: path
+        minimum: 1
         name: id
         required: true
         type: integer
-      - description: Song name
+      - description: JSON-body
         in: body
         name: song
+        required: true
         schema:
-          type: string
-      - description: Group name
-        in: body
-        name: group
-        schema:
-          type: string
+          $ref: '#/definitions/internal_controller_http_v1.updateSongInput'
       responses:
         "200":
           description: OK
@@ -178,16 +244,25 @@ paths:
       description: Get song text with pagination by couplets
       parameters:
       - description: Song ID
+        example: 2
         in: path
+        minimum: 1
         name: id
         required: true
         type: integer
-      - description: Offset, default 0
+      - default: 0
+        description: Offset
+        example: 10
         in: query
+        minimum: 0
         name: offset
         type: integer
-      - description: Limit, default 5
+      - default: 5
+        description: Limit
+        example: 10
         in: query
+        maximum: 10
+        minimum: 1
         name: limit
         type: integer
       produces:
@@ -216,19 +291,17 @@ paths:
       description: Edit song text by id
       parameters:
       - description: Song ID
+        example: 2
         in: path
         name: id
         required: true
         type: integer
-      - description: |-
-          New song text. Each couplet is separated by `
-
-          `
+      - description: New song text. Each couplet is separated by double newline symbols.
         in: body
         name: text
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/internal_controller_http_v1.updateSongTextInput'
       responses:
         "200":
           description: OK

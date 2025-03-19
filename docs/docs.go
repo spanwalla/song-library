@@ -25,25 +25,34 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Example: ?filter[name]=Song\u0026filter[group]=Muse",
+                        "example": "Muse",
+                        "description": "Filters, can be multiple",
                         "name": "filter[\u003cname\u003e]",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Example: ?order_by=name:asc,link:desc,group. Default: asc",
+                        "example": "song:asc,group:desc,release_date",
+                        "description": "List of sort criteria. Direction will set to asc if it is not stated",
                         "name": "order_by",
                         "in": "query"
                     },
                     {
+                        "minimum": 0,
                         "type": "integer",
-                        "description": "Offset, default 0",
+                        "default": 0,
+                        "example": 10,
+                        "description": "Offset",
                         "name": "offset",
                         "in": "query"
                     },
                     {
+                        "maximum": 10,
+                        "minimum": 1,
                         "type": "integer",
-                        "description": "Limit, default 5",
+                        "default": 5,
+                        "example": 10,
+                        "description": "Limit",
                         "name": "limit",
                         "in": "query"
                     }
@@ -80,21 +89,12 @@ const docTemplate = `{
                 "summary": "Add new song",
                 "parameters": [
                     {
-                        "description": "Song name",
-                        "name": "song",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Group name",
+                        "description": "Short song info",
                         "name": "group",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/internal_controller_http_v1.insertSongInput"
                         }
                     }
                 ],
@@ -126,7 +126,9 @@ const docTemplate = `{
                 "summary": "Get song by id",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
+                        "example": 2,
                         "description": "Song ID",
                         "name": "id",
                         "in": "path",
@@ -168,26 +170,21 @@ const docTemplate = `{
                 "summary": "Edit song",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
+                        "example": 2,
                         "description": "Song ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Song name",
+                        "description": "JSON-body",
                         "name": "song",
                         "in": "body",
+                        "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Group name",
-                        "name": "group",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/internal_controller_http_v1.updateSongInput"
                         }
                     }
                 ],
@@ -214,7 +211,9 @@ const docTemplate = `{
                 "summary": "Delete song",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
+                        "example": 2,
                         "description": "Song ID",
                         "name": "id",
                         "in": "path",
@@ -249,21 +248,30 @@ const docTemplate = `{
                 "summary": "Get song text",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
+                        "example": 2,
                         "description": "Song ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
+                        "minimum": 0,
                         "type": "integer",
-                        "description": "Offset, default 0",
+                        "default": 0,
+                        "example": 10,
+                        "description": "Offset",
                         "name": "offset",
                         "in": "query"
                     },
                     {
+                        "maximum": 10,
+                        "minimum": 1,
                         "type": "integer",
-                        "description": "Limit, default 5",
+                        "default": 5,
+                        "example": 10,
+                        "description": "Limit",
                         "name": "limit",
                         "in": "query"
                     }
@@ -304,18 +312,19 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
+                        "example": 2,
                         "description": "Song ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "New song text. Each couplet is separated by ` + "`" + `\n\n` + "`" + `",
+                        "description": "New song text. Each couplet is separated by double newline symbols.",
                         "name": "text",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/internal_controller_http_v1.updateSongTextInput"
                         }
                     }
                 ],
@@ -350,24 +359,96 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "group": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Nirvana"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "link": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "https://www.youtube.com/watch?v=JirXTmnItd4"
                 },
                 "releaseDate": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2002-10-29T00:00:00Z"
                 },
                 "song": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Smells Like Teen Spirit"
+                }
+            }
+        },
+        "internal_controller_http_v1.insertSongInput": {
+            "type": "object",
+            "required": [
+                "group",
+                "song"
+            ],
+            "properties": {
+                "group": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "example": "The Cure"
+                },
+                "song": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "example": "Love Song"
                 }
             }
         },
         "internal_controller_http_v1.songRoutes": {
             "type": "object"
+        },
+        "internal_controller_http_v1.updateSongInput": {
+            "type": "object",
+            "required": [
+                "group",
+                "link",
+                "releaseDate",
+                "song"
+            ],
+            "properties": {
+                "group": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "example": "Hannah"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "link": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "example": "https://www.youtube.com/watch?v=Xsp3_a-PMTw"
+                },
+                "releaseDate": {
+                    "type": "string",
+                    "example": "2006-06-22"
+                },
+                "song": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "example": "Best Compilation"
+                }
+            }
+        },
+        "internal_controller_http_v1.updateSongTextInput": {
+            "type": "object",
+            "required": [
+                "text"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string",
+                    "example": "I can do\nit easily\n\nNew couplet.\n\nAnother one."
+                }
+            }
         }
     }
 }`
