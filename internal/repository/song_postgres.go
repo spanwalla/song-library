@@ -130,11 +130,26 @@ func (r *SongRepo) Search(ctx context.Context, filters map[string]string, orderB
 }
 
 func (r *SongRepo) UpdateById(ctx context.Context, songId int, song entity.Song) error {
+	sql, args, _ := r.Builder.
+		Update("songs").
+		Where("id = ?", songId).
+		Set("song_name", song.Name).
+		Set("group_name", song.Group).
+		Set("link", song.Link).
+		Set("release_date", song.ReleaseDate).
+		ToSql()
+
+	_, err := r.GetQueryRunner(ctx).Exec(ctx, sql, args...)
+	if err != nil {
+		return fmt.Errorf("SongRepo.UpdateById - Exec: %w", err)
+	}
+
 	return nil
 }
 
 func (r *SongRepo) DeleteById(ctx context.Context, songId int) error {
-	sql, args, _ := r.Builder.Delete("songs").
+	sql, args, _ := r.Builder.
+		Delete("songs").
 		Where("id = ?", songId).
 		ToSql()
 

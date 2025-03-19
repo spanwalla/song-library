@@ -95,13 +95,17 @@ func (s *SongService) GetText(ctx context.Context, input GetTextInput) ([]string
 		return []string{}, 0, ErrCannotGetText
 	}
 
+	if count == 0 {
+		return []string{}, 0, ErrSongNotFound
+	}
+
 	couplets, err := s.coupletRepo.GetBySongId(ctx, input.SongId, input.Offset, input.Limit)
 	if err != nil {
 		log.Errorf("SongService.GetText - s.coupletRepo.GetBySongId: %v", err)
 		return []string{}, 0, ErrCannotGetText
 	}
 
-	var text []string
+	text := make([]string, 0)
 	for _, couplet := range couplets {
 		text = append(text, couplet.Text)
 	}
@@ -110,7 +114,42 @@ func (s *SongService) GetText(ctx context.Context, input GetTextInput) ([]string
 }
 
 func (s *SongService) Update(ctx context.Context, songId int, input UpdateSongInput) error {
+	err := s.songRepo.UpdateById(ctx, songId, entity.Song{
+		Name:        input.Name,
+		Group:       input.Group,
+		Link:        input.Link,
+		ReleaseDate: input.ReleaseDate,
+	})
+	if err != nil {
+		log.Errorf("SongService.Update - s.songRepo.UpdateById: %v", err)
+		return ErrCannotUpdateSong
+	}
 	return nil
+}
+
+func (s *SongService) UpdateText(ctx context.Context, songId int, text string) error {
+	coupletsStr := strings.Split(text, "\n\n")
+
+	couplets := make([]entity.Couplet, 0)
+	for i, val := range coupletsStr {
+		couplets = append(couplets, entity.Couplet{SongId: songId, SequenceNumber: i + 1, Text: val})
+	}
+
+	return s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
+		err := s.coupletRepo.DeleteBySongId(txCtx, songId)
+		if err != nil {
+			log.Errorf("SongService.UpdateText - s.coupletRepo.DeleteBySongId: %v", err)
+			return ErrCannotUpdateCouplets
+		}
+
+		err = s.coupletRepo.Insert(txCtx, couplets)
+		if err != nil {
+			log.Errorf("SongService.UpdateText - s.coupletRepo.Insert: %v", err)
+			return ErrCannotUpdateCouplets
+		}
+
+		return nil
+	})
 }
 
 func (s *SongService) Delete(ctx context.Context, songId int) error {

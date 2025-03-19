@@ -141,7 +141,7 @@ paths:
           schema:
             $ref: '#/definitions/echo.HTTPError'
       summary: Get song by id
-    patch:
+    put:
       consumes:
       - application/json
       description: Edit song by id
@@ -210,4 +210,35 @@ paths:
           schema:
             $ref: '#/definitions/echo.HTTPError'
       summary: Get song text
+    put:
+      consumes:
+      - application/json
+      description: Edit song text by id
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: |-
+          New song text. Each couplet is separated by `
+
+          `
+        in: body
+        name: text
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Edit song text
 swagger: "2.0"

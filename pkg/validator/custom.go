@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/go-playground/validator"
 )
@@ -23,6 +24,11 @@ func NewCustomValidator() *CustomValidator {
 		}
 		return name
 	})
+
+	err := v.RegisterValidation("date", cv.validateDate)
+	if err != nil {
+		panic(err)
+	}
 
 	return cv
 }
@@ -45,7 +51,21 @@ func (cv *CustomValidator) newValidationError(field string, tag string, param st
 		return fmt.Errorf("field %s must be at least %s characters", field, param)
 	case "max":
 		return fmt.Errorf("field %s must be at most %s characters", field, param)
+	case "date":
+		return fmt.Errorf("field %s must be a valid date (format: 2006-01-17)", field)
+	case "uri":
+		return fmt.Errorf("field %s must be a valid URI", field)
+	case "number":
+		return fmt.Errorf("field %s must be a valid number", field)
+	case "gt":
+		return fmt.Errorf("field %s must be greater than %s", field, param)
 	default:
 		return fmt.Errorf("field %s is invalid", field)
 	}
+}
+
+func (cv *CustomValidator) validateDate(fl validator.FieldLevel) bool {
+	dateStr := fl.Field().String()
+	_, err := time.Parse("2006-01-02", dateStr)
+	return err == nil
 }

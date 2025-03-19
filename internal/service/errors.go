@@ -9,5 +9,7 @@ var (
 	ErrSongNotFound         = errors.New("song not found")
 	ErrCannotGetSong        = errors.New("cannot get song")
 	ErrCannotGetText        = errors.New("cannot get text")
+	ErrCannotUpdateSong     = errors.New("cannot update song")
+	ErrCannotUpdateCouplets = errors.New("cannot update couplets")
 	ErrCannotDeleteSong     = errors.New("cannot delete song")
 )

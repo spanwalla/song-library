@@ -22,7 +22,7 @@ docker-compose up --build -d
 ```
 make compose-up
 ```
-4. Для остановки используйте команду
+5. Для остановки используйте команду
 ```
 docker-compose down --remove-orphans
 ```

@@ -17,11 +17,10 @@ type InsertSongInput struct {
 }
 
 type UpdateSongInput struct {
-	Name        *string
-	Group       *string
-	Link        *string
-	ReleaseDate *time.Time
-	Text        *string
+	Name        string
+	Group       string
+	Link        string
+	ReleaseDate time.Time
 }
 
 type GetTextInput struct {
@@ -43,6 +42,7 @@ type Song interface {
 	Get(ctx context.Context, songId int) (entity.Song, error)
 	GetText(ctx context.Context, input GetTextInput) ([]string, int, error)
 	Update(ctx context.Context, songId int, input UpdateSongInput) error
+	UpdateText(ctx context.Context, songId int, text string) error
 	Delete(ctx context.Context, songId int) error
 }
 
