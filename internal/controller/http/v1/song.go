@@ -230,7 +230,11 @@ func (r *songRoutes) patchSong(c echo.Context) error {
 		ReleaseDate: input.ReleaseDate,
 	})
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, "internal server error")
+		if errors.Is(err, service.ErrFieldsAreEmpty) {
+			newErrorResponse(c, http.StatusBadRequest, err.Error())
+		} else {
+			newErrorResponse(c, http.StatusInternalServerError, "internal server error")
+		}
 		return err
 	}
 
