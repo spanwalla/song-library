@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	log "github.com/sirupsen/logrus"
 	"github.com/spanwalla/song-library/internal/entity"
 	"github.com/spanwalla/song-library/pkg/postgres"
+	"strings"
 )
 
 type SongRepo struct {
@@ -64,6 +66,65 @@ func (r *SongRepo) GetById(ctx context.Context, songId int) (entity.Song, error)
 	}
 
 	return song, nil
+}
+
+func (r *SongRepo) Search(ctx context.Context, filters map[string]string, orderBy [][]string, offset, limit int) ([]entity.Song, error) {
+	validColumnsMapping := map[string]string{
+		"id":          "id",
+		"group":       "group_name",
+		"song":        "song_name",
+		"link":        "link",
+		"releaseDate": "release_date",
+	}
+
+	query := r.Builder.
+		Select("id, group_name, song_name, link, release_date").
+		From("songs")
+
+	for field, value := range filters {
+		if dbColumn, ok := validColumnsMapping[field]; ok {
+			query = query.Where(fmt.Sprintf("%s = ?", dbColumn), value)
+		}
+	}
+
+	for _, field := range orderBy {
+		if dbColumn, ok := validColumnsMapping[field[0]]; ok {
+			if strings.ToLower(field[1]) == "asc" || strings.ToLower(field[1]) == "desc" {
+				query = query.OrderBy(fmt.Sprintf("%s %s", dbColumn, field[1]))
+			}
+		}
+	}
+
+	if limit > maxPaginationLimit {
+		limit = maxPaginationLimit
+	} else if limit <= 0 {
+		limit = defaultPaginationLimit
+	}
+
+	if offset < 0 {
+		offset = 0
+	}
+
+	sql, args, _ := query.Offset(uint64(offset)).Limit(uint64(limit)).ToSql()
+	log.Debugf("SongRepo.Search - sql: %s", sql)
+
+	cmdTag, err := r.GetQueryRunner(ctx).Query(ctx, sql, args...)
+	if err != nil {
+		return nil, fmt.Errorf("SongRepo.Search - Query: %w", err)
+	}
+	defer cmdTag.Close()
+
+	songs := make([]entity.Song, 0)
+	for cmdTag.Next() {
+		var song entity.Song
+		err = cmdTag.Scan(&song.Id, &song.Group, &song.Name, &song.Link, &song.ReleaseDate)
+		if err != nil {
+			return nil, fmt.Errorf("SongRepo.Search - Scan: %w", err)
+		}
+		songs = append(songs, song)
+	}
+
+	return songs, nil
 }
 
 func (r *SongRepo) UpdateById(ctx context.Context, songId int, song entity.Song) error {

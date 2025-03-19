@@ -76,6 +76,16 @@ func (s *SongService) Get(ctx context.Context, songId int) (entity.Song, error) 
 	return song, nil
 }
 
+func (s *SongService) Search(ctx context.Context, input SearchSongInput) ([]entity.Song, error) {
+	songs, err := s.songRepo.Search(ctx, input.Filters, input.OrderBy, input.Offset, input.Limit)
+	if err != nil {
+		log.Errorf("SongService.Search - s.songRepo.Search: %v", err)
+		return []entity.Song{}, ErrCannotGetSong
+	}
+
+	return songs, nil
+}
+
 func (s *SongService) GetText(ctx context.Context, input GetTextInput) ([]string, int, error) {
 	count, err := s.coupletRepo.GetCoupletsCount(ctx, input.SongId)
 	if err != nil {

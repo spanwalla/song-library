@@ -8,11 +8,6 @@ import (
 	"github.com/spanwalla/song-library/pkg/postgres"
 )
 
-const (
-	maxPaginationLimit     = 10
-	defaultPaginationLimit = 5
-)
-
 type CoupletRepo struct {
 	*postgres.Postgres
 }
@@ -53,7 +48,7 @@ func (r *CoupletRepo) GetBySongId(ctx context.Context, songId, offset, limit int
 	}
 
 	sql, args, _ := r.Builder.
-		Select("song_id, sequence_number, text").
+		Select("song_id, sequence_number, couplet_text").
 		From("couplets").
 		Where("song_id = ?", songId).
 		OrderBy("sequence_number").
@@ -67,7 +62,7 @@ func (r *CoupletRepo) GetBySongId(ctx context.Context, songId, offset, limit int
 	}
 	defer cmdTag.Close()
 
-	var couplets []entity.Couplet
+	couplets := make([]entity.Couplet, 0)
 	for cmdTag.Next() {
 		var couplet entity.Couplet
 		err = cmdTag.Scan(&couplet.SongId, &couplet.SequenceNumber, &couplet.Text)

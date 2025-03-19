@@ -25,13 +25,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Example: \u0026filter[name]=Song\u0026filter[group]=Muse",
+                        "description": "Example: ?filter[name]=Song\u0026filter[group]=Muse",
                         "name": "filter[\u003cname\u003e]",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Example: \u0026order_by=name:asc,link:desc,group. Default: asc",
+                        "description": "Example: ?order_by=name:asc,link:desc,group. Default: asc",
                         "name": "order_by",
                         "in": "query"
                     },
@@ -77,9 +77,6 @@ const docTemplate = `{
                 "consumes": [
                     "application/json"
                 ],
-                "produces": [
-                    "application/json"
-                ],
                 "summary": "Add new song",
                 "parameters": [
                     {
@@ -103,10 +100,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/internal_controller_http_v1.songRoutes"
-                        }
+                        "description": "Created"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -168,9 +162,6 @@ const docTemplate = `{
             },
             "delete": {
                 "description": "Delete song by id",
-                "produces": [
-                    "application/json"
-                ],
                 "summary": "Delete song",
                 "parameters": [
                     {
@@ -183,10 +174,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/internal_controller_http_v1.songRoutes"
-                        }
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -205,9 +193,6 @@ const docTemplate = `{
             "patch": {
                 "description": "Edit song by id",
                 "consumes": [
-                    "application/json"
-                ],
-                "produces": [
                     "application/json"
                 ],
                 "summary": "Edit song",
@@ -238,10 +223,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/internal_controller_http_v1.songRoutes"
-                        }
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -334,10 +316,10 @@ const docTemplate = `{
                 "link": {
                     "type": "string"
                 },
-                "name": {
+                "releaseDate": {
                     "type": "string"
                 },
-                "releaseDate": {
+                "song": {
                     "type": "string"
                 }
             }

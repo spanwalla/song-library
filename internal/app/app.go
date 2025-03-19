@@ -12,6 +12,7 @@ import (
 	"github.com/spanwalla/song-library/internal/webapi"
 	"github.com/spanwalla/song-library/pkg/httpserver"
 	"github.com/spanwalla/song-library/pkg/postgres"
+	"github.com/spanwalla/song-library/pkg/validator"
 	"os"
 	"os/signal"
 	"syscall"
@@ -58,6 +59,7 @@ func Run() {
 	// Echo handler
 	log.Info("Initializing handlers and routes...")
 	handler := echo.New()
+	handler.Validator = validator.NewCustomValidator()
 	v1.ConfigureRouter(handler, services)
 
 	// HTTP Server

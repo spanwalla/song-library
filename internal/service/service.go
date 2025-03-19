@@ -29,9 +29,16 @@ type GetTextInput struct {
 	Limit  int
 }
 
+type SearchSongInput struct {
+	Filters map[string]string
+	OrderBy [][]string
+	Offset  int
+	Limit   int
+}
+
 type Song interface {
 	Insert(ctx context.Context, input InsertSongInput) error
-	// Get TODO: Фильтрация по всем полям и пагинация
+	Search(ctx context.Context, input SearchSongInput) ([]entity.Song, error)
 	Get(ctx context.Context, songId int) (entity.Song, error)
 	GetText(ctx context.Context, input GetTextInput) ([]string, int, error)
 	Update(ctx context.Context, songId int, input UpdateSongInput) error

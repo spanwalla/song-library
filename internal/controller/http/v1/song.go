@@ -3,7 +3,7 @@ package v1
 import (
 	"errors"
 	"github.com/labstack/echo/v4"
-	"github.com/spanwalla/song-library/internal/entity"
+	_ "github.com/spanwalla/song-library/internal/entity" // for swagger docs
 	"github.com/spanwalla/song-library/internal/service"
 	"github.com/spanwalla/song-library/pkg/query"
 	"net/http"
@@ -14,7 +14,7 @@ type songRoutes struct {
 }
 
 type songIdInput struct {
-	Id int `param:"id" validate:"required,number,gt=0"`
+	Id int `param:"id" validate:"required,number,min=0"`
 }
 
 type insertSongInput struct {
@@ -35,8 +35,8 @@ func newSongRoutes(g *echo.Group, songService service.Song) {
 
 // @Description Search songs with filters
 // @Summary Search songs
-// @Param filter[<name>] query string false "Example: &filter[name]=Song&filter[group]=Muse"
-// @Param order_by query string false "Example: &order_by=name:asc,link:desc,group. Default: asc"
+// @Param filter[<name>] query string false "Example: ?filter[name]=Song&filter[group]=Muse"
+// @Param order_by query string false "Example: ?order_by=name:asc,link:desc,group. Default: asc"
 // @Param offset query int false "Offset, default 0"
 // @Param limit query int false "Limit, default 5"
 // @Produce json
@@ -45,7 +45,28 @@ func newSongRoutes(g *echo.Group, songService service.Song) {
 // @Failure 500 {object} echo.HTTPError
 // @Router /songs [get]
 func (r *songRoutes) searchSongs(c echo.Context) error {
-	return c.JSON(http.StatusOK, []entity.Song{})
+	q := query.NewParams(c.QueryParams())
+	q.ParseFilters()
+	q.ParseSortCriteria()
+	q.ParsePagination()
+
+	var orderBy [][]string
+	for _, criteria := range q.SortCriteria {
+		orderBy = append(orderBy, []string{criteria.Field, criteria.Order})
+	}
+
+	songs, err := r.songService.Search(c.Request().Context(), service.SearchSongInput{
+		Filters: q.Filters,
+		OrderBy: orderBy,
+		Offset:  q.Offset,
+		Limit:   q.Limit,
+	})
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, "internal server error")
+		return err
+	}
+
+	return c.JSON(http.StatusOK, songs)
 }
 
 // @Description Get song by id

@@ -12,9 +12,9 @@ definitions:
         type: integer
       link:
         type: string
-      name:
-        type: string
       releaseDate:
+        type: string
+      song:
         type: string
     type: object
   internal_controller_http_v1.songRoutes:
@@ -29,11 +29,11 @@ paths:
     get:
       description: Search songs with filters
       parameters:
-      - description: 'Example: &filter[name]=Song&filter[group]=Muse'
+      - description: 'Example: ?filter[name]=Song&filter[group]=Muse'
         in: query
         name: filter[<name>]
         type: string
-      - description: 'Example: &order_by=name:asc,link:desc,group. Default: asc'
+      - description: 'Example: ?order_by=name:asc,link:desc,group. Default: asc'
         in: query
         name: order_by
         type: string
@@ -80,13 +80,9 @@ paths:
         required: true
         schema:
           type: string
-      produces:
-      - application/json
       responses:
         "201":
           description: Created
-          schema:
-            $ref: '#/definitions/internal_controller_http_v1.songRoutes'
         "400":
           description: Bad Request
           schema:
@@ -105,13 +101,9 @@ paths:
         name: id
         required: true
         type: integer
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/internal_controller_http_v1.songRoutes'
         "400":
           description: Bad Request
           schema:
@@ -169,13 +161,9 @@ paths:
         name: group
         schema:
           type: string
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/internal_controller_http_v1.songRoutes'
         "400":
           description: Bad Request
           schema:
