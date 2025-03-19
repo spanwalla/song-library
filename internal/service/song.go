@@ -3,11 +3,13 @@ package service
 import (
 	"context"
 	"errors"
+	"strings"
+
 	log "github.com/sirupsen/logrus"
+
 	"github.com/spanwalla/song-library/internal/entity"
 	"github.com/spanwalla/song-library/internal/repository"
 	"github.com/spanwalla/song-library/internal/webapi"
-	"strings"
 )
 
 type SongService struct {

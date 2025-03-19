@@ -1,12 +1,14 @@
 package v1
 
 import (
+	"os"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	log "github.com/sirupsen/logrus"
-	"github.com/spanwalla/song-library/internal/service"
 	echoSwagger "github.com/swaggo/echo-swagger"
-	"os"
+
+	"github.com/spanwalla/song-library/internal/service"
 )
 
 func ConfigureRouter(handler *echo.Echo, services *service.Services) {

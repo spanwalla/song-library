@@ -2,11 +2,13 @@ package v1
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
+
 	_ "github.com/spanwalla/song-library/internal/entity" // for swagger docs
 	"github.com/spanwalla/song-library/internal/service"
 	"github.com/spanwalla/song-library/pkg/query"
-	"net/http"
 )
 
 type songRoutes struct {
@@ -232,8 +234,4 @@ func (r *songRoutes) insertSong(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusCreated)
-}
-
-func (r *songRoutes) toDo(c echo.Context) error {
-	return c.NoContent(http.StatusNotImplemented)
 }

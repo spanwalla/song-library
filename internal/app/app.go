@@ -2,8 +2,13 @@ package app
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
+
 	"github.com/spanwalla/song-library/config"
 	_ "github.com/spanwalla/song-library/docs"
 	v1 "github.com/spanwalla/song-library/internal/controller/http/v1"
@@ -13,9 +18,6 @@ import (
 	"github.com/spanwalla/song-library/pkg/httpserver"
 	"github.com/spanwalla/song-library/pkg/postgres"
 	"github.com/spanwalla/song-library/pkg/validator"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 // @title Song Library

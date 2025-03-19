@@ -26,11 +26,11 @@ migrate-down: ### Migration down
 .PHONY: migrate-down
 
 linter-golangci: ### Check by golangci linter
-	golangci-lint run
+	go tool github.com/golangci/golangci-lint/cmd/golangci-lint run
 .PHONY: linter-golangci
 
 swag: ### Generate swagger docs
-	swag init -g 'internal/app/app.go' --parseInternal --parseDependency
+	go tool github.com/swaggo/swag/cmd/swag init -g 'internal/app/app.go' --parseInternal --parseDependency
 .PHONY: swag
 
 test: ### Run test
@@ -38,9 +38,9 @@ test: ### Run test
 .PHONY: test
 
 mockgen: ### Generate mock
-	mockgen -source='internal/service/service.go'       -destination='internal/mocks/service/mock.go'    -package=servicemocks
-	mockgen -source='internal/repository/repository.go' -destination='internal/mocks/repository/mock.go' -package=repomocks
-	mockgen -source='internal/webapi/webapi.go'         -destination='internal/mocks/webapi/mock.go'     -package=webapimocks
+	go tool go.uber.org/mock/mockgen -source='internal/service/service.go'       -destination='internal/mocks/service/mock.go'    -package=servicemocks
+	go tool go.uber.org/mock/mockgen -source='internal/repository/repository.go' -destination='internal/mocks/repository/mock.go' -package=repomocks
+	go tool go.uber.org/mock/mockgen -source='internal/webapi/webapi.go'         -destination='internal/mocks/webapi/mock.go'     -package=webapimocks
 .PHONY: mockgen
 
 bin-deps: ### Install binary dependencies

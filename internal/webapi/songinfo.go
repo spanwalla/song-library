@@ -16,9 +16,9 @@ type SongInfoWebAPI struct {
 	URL string
 }
 
-func NewSongInfoWebAPI(URL string) *SongInfoWebAPI {
-	// return &SongInfoWebAPI{http.DefaultClient, URL}
-	return &SongInfoWebAPI{URL}
+func NewSongInfoWebAPI(url string) *SongInfoWebAPI {
+	// return &SongInfoWebAPI{http.DefaultClient, url}
+	return &SongInfoWebAPI{url}
 }
 
 func (siw *SongInfoWebAPI) Get(ctx context.Context, group, song string) (GetSongInfoOutput, error) {

@@ -2,10 +2,11 @@ package service
 
 import (
 	"context"
+	"time"
+
 	"github.com/spanwalla/song-library/internal/entity"
 	"github.com/spanwalla/song-library/internal/repository"
 	"github.com/spanwalla/song-library/internal/webapi"
-	"time"
 )
 
 //go:generate mockgen -source=service.go -destination=../mocks/service/mock.go -package=servicemocks

@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	log "github.com/sirupsen/logrus"
+
 	"github.com/spanwalla/song-library/internal/entity"
 	"github.com/spanwalla/song-library/pkg/postgres"
-	"strings"
 )
 
 type SongRepo struct {
