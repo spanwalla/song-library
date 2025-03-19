@@ -279,6 +279,7 @@ func (r *songRoutes) putSongText(c echo.Context) error {
 // @Success 201
 // @Failure 400 {object} echo.HTTPError
 // @Failure 500 {object} echo.HTTPError
+// @Failure 502 {object} echo.HTTPError
 // @Router /songs [post]
 func (r *songRoutes) insertSong(c echo.Context) error {
 	var input insertSongInput
@@ -298,10 +299,12 @@ func (r *songRoutes) insertSong(c echo.Context) error {
 		Song:  input.Song,
 	})
 	if err != nil {
-		if errors.Is(err, service.ErrCannotInsertSong) || errors.Is(err, service.ErrCannotInsertCouplets) ||
-			errors.Is(err, service.ErrCannotGetSongInfo) {
+		switch {
+		case errors.Is(err, service.ErrCannotInsertSong) || errors.Is(err, service.ErrCannotInsertCouplets):
 			newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		} else {
+		case errors.Is(err, service.ErrCannotGetSongInfo):
+			newErrorResponse(c, http.StatusBadGateway, err.Error())
+		default:
 			newErrorResponse(c, http.StatusInternalServerError, "internal server error")
 		}
 		return err
