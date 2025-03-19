@@ -57,11 +57,6 @@ definitions:
         example: Best Compilation
         maxLength: 128
         type: string
-    required:
-    - group
-    - link
-    - releaseDate
-    - song
     type: object
   internal_controller_http_v1.updateSongTextInput:
     properties:
@@ -168,8 +163,8 @@ paths:
         required: true
         type: integer
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         "400":
           description: Bad Request
           schema:
@@ -209,7 +204,7 @@ paths:
           schema:
             $ref: '#/definitions/echo.HTTPError'
       summary: Get song by id
-    put:
+    patch:
       consumes:
       - application/json
       description: Edit song by id
@@ -228,8 +223,8 @@ paths:
         schema:
           $ref: '#/definitions/internal_controller_http_v1.updateSongInput'
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         "400":
           description: Bad Request
           schema:
@@ -303,8 +298,8 @@ paths:
         schema:
           $ref: '#/definitions/internal_controller_http_v1.updateSongTextInput'
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         "400":
           description: Bad Request
           schema:

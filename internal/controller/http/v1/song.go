@@ -2,8 +2,9 @@ package v1
 
 import (
 	"errors"
-	"github.com/labstack/echo/v4"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 
 	_ "github.com/spanwalla/song-library/internal/entity" // for swagger docs
 	"github.com/spanwalla/song-library/internal/service"
@@ -174,7 +175,7 @@ func (r *songRoutes) getSongText(c echo.Context) error {
 // @Description Delete song by id
 // @Summary Delete song
 // @Param id path int true "Song ID" minimum(1) example(2)
-// @Success 200
+// @Success 204
 // @Failure 400 {object} echo.HTTPError
 // @Failure 500 {object} echo.HTTPError
 // @Router /songs/{id} [delete]
@@ -197,7 +198,7 @@ func (r *songRoutes) deleteSong(c echo.Context) error {
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // @Description Edit song by id
