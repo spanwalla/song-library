@@ -122,12 +122,12 @@ func (s *SongService) Update(ctx context.Context, songId int, input UpdateSongIn
 	var releaseDate *time.Time = nil
 
 	if input.ReleaseDate != nil {
-		var err error
-		*releaseDate, err = time.Parse("2006-01-02", *input.ReleaseDate)
+		parsedDate, err := time.Parse("2006-01-02", *input.ReleaseDate)
 		if err != nil {
 			log.Errorf("SongService.Update - time.Parse: %v", err)
 			return ErrCannotUpdateSong
 		}
+		releaseDate = &parsedDate
 	}
 
 	err := s.songRepo.UpdateById(ctx, songId, repository.UpdateSongInput{
