@@ -113,6 +113,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/echo.HTTPError"
                         }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
                     }
                 }
             }

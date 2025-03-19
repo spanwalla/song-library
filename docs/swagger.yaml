@@ -150,6 +150,10 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/echo.HTTPError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
       summary: Add new song
   /songs/{id}:
     delete:
